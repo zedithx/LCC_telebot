@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "lcc-luckydraw",
+  "private_key_id": "411851d988bdc19d954e56eefbfd6224d349258d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC9caYkRqNhMAi3\n8OI5I+1vkDjah8gPtGeyJioV6oEKy4odPjKaxXrNObAA01DmqT0XNH60JJNhd9yC\nsPcnuqbXGAiAsZmoaamDxyAwrPBSVxquopOKWN21utYQSJjDe7RIaw42x/YkMyQh\nYDcxgDrtiqeY+j0rcZzjODEiCC9CYn5hXawSPBRDMoqQKQfjKKqk2WKzK4Ecd+qT\nhT5cEXMThas5zO2TcRsQc87mhBHBk7I9avvpBNR5sDyhvv/o7am7K2mcVWHhGCAd\nrvkGrLRPc/O5Jfs6E81SJIquvKeD9VQuVILw5gCCcu8aMIrGKwagEuQEOiwYwJ6T\njWdas47nAgMBAAECggEAG3E6nXekFCCGqsqYoqlbLDWKntFbgDbkbJCNuSYCsmMg\nqzLG1tezfcYVAlGaHwe2A0YF8qd3t/9KcJ4c92LY50Cifq37ccN4nE+8kICEwZC/\nmzuOvtQ3rasWdj5l7q9dQr5LTVEzDTRhT/pllGScZKuYspbRRJlNHjcWGvVvjyCA\nm57tH81ZldIH3CUSKkpX29HS/3D3bhOD/WjD5gQSDR94IwJO40o4ky+cdAhERPpX\njLKygUnsYPIqMvokk7vlzXaD0sI8nB1cFCdRyXQ50JPcShDLU9aZ+4nqrjWk6Gi6\nv9T5cLEo1LJ/CO1iyiIuDDB5I1bIay2q9KzNpgdtEQKBgQDdMY3SRvhm3f5CPaOI\nw8/dU6xDkmnRlFbsoPBydODIgyVkq7m6CMRLHVbOECTsJTRHPCxz01wFX32EfgSI\nIIlLJdeZ58DkPYVeeU44UJYIv7/yvol1LENck7VZnMpXNp9hdIVP3WIxfhY2rgg1\nm1Y0HFnKEbL/7yrU+uBmM0QmkQKBgQDbQRwMr5I34x40xHQz/9m/oKcv8o02sl9O\n5qfMkdSkwteQvRB+eiDq0tf7AkeSFnUcerSD2fIOn7RoUSEt4uL8ihL23aktVri0\noXfnj8iEFrPpvIU27sPWthrIYqjzM3+v3Mcrexn0JyAz7ZGTDae3lEeNjg4125IW\n7NRCDUNJ9wKBgHRDCqc+9GulPXJ10ZIeUhCkXUQ7HfGxxaqkwR13/3qFLE9oz7tP\nxlUw+6Jd6/pPZ9YVc8wBiTmtwly0nA8tAt0D6/oSTVnqWEKbAhkpimLY3rxpl/iF\npnZvkP+kINqMdGOWCkg7NdSL0IM3IEuE9V94k11Zxjst69Z8cxxkz+pxAoGAXtCg\nRagjTkHMTTtrmRUaYDEkO6rjgHTQnHlItUGXOIz91Zy9JkTAOWxmdCj/NGC70k4K\nBD7a25Ia3UXAWGyWhmlbXCBtSasIAy0UgjH+n4iF0x1waloEnLRxjpiDwXBS1oVe\nKCJ7DcdhuLMS0goErnHUI5X79TR3z6wo+ktr/u8CgYAbRedvLe87xlrv2LMER0/s\nhhoX7Fw4Sznz6prtrDZ6rPKOLiYA4c55UY3xH9TBmpCjMBFMIWGbLafneHuX+vRx\noXAqrCAqEXywox9YS8dqimzfyExYKdzlmky8jFpXkNk6tHlT2VjGYPX1GjS2qD2v\nwp1PWAGHiOsCtm4eR8Avgw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-8yfvz@lcc-luckydraw.iam.gserviceaccount.com",
+  "client_id": "106177328493226302936",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-8yfvz%40lcc-luckydraw.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
