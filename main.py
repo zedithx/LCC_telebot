@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 """initialising variables/bot"""
-TOKEN = '6397262167:AAHv4Y9HlrZ-aVGeT0t6nWs8W1XlpzDHKvI'
+TOKEN = ''
 bot = telegram.Bot(token=TOKEN)
 luckydraw_no = 1
 voting_dict = {'1': "placeholder1", '2': "placeholder2", '3': "placeholder3", '4':"placeholder4"}
@@ -29,7 +29,7 @@ VOTING, REVOTING, REVOTED = range(3)
 """Initialising firebase creds"""
 cred_obj = firebase_admin.credentials.Certificate('./creds.json')
 default_app = firebase_admin.initialize_app(cred_obj, {
-    'databaseURL': 'https://lcc-luckydraw-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    'databaseURL': ''
 })
 ref = db.reference("/")
 
