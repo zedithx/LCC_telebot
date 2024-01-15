@@ -2,6 +2,7 @@ import os
 import logging
 import telegram
 import firebase_admin
+from firebase_admin import db
 
 from functools import wraps
 from telegram import Update, ReplyKeyboardRemove, ChatAction, ReplyKeyboardMarkup
@@ -18,8 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 """initialising variables/bot"""
-TOKEN = '6397262167:AAF5JUnqD_spZzNeGPWmf-nDX_X2VeUgbiQ'
-bot = telegram.Bot(token=TOKEN)
+bot = telegram.Bot(token=os.environ.get("TOKEN"))
 luckydraw_no = 1
 
 # define no. of variables to be stored
@@ -36,9 +36,9 @@ VOTING, CATEGORY, UROP, OVERSEAS, FIFTHROW = range(5)
 """Initialising firebase creds"""
 cred_obj = firebase_admin.credentials.Certificate('./creds.json')
 default_app = firebase_admin.initialize_app(cred_obj, {
-    'databaseURL': 'https://lcc-luckydraw-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    'databaseURL': os.environ.get("DATABASE_URL")
 })
-ref = firebase_admin.db.reference("/")
+ref = db.reference("/")
 
 
 def send_typing_action(func):
