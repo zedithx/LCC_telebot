@@ -8,85 +8,85 @@ urop = {
 }
 
 # overseas
-overseas = {
-    '1': 'fact',
-    '2': 'berkeley',
-    '3': 'stanford',
-    '4': 'berlin',
-    '5': 'aalto',
-    '6': 'kaist',
-    '7': 'hanyang',
-    '8': 'yonsei',
-    '9': 'skku',
-    '10': 'ubc',
-    '11': 'macau',
-    '12': 'iacocca',
-    '13': 'mitacs'
-}
-
-# overseas
 fact = {
-        '1': ["FACT - (DTIxUPM)", ],
-        '2': ["FACT - (SSWxUBD)", ],
-        '3': ["FACT - (DESxSZTU)", ],
+        '1': ["FACT - (DTIxUPM)", 'images/overseas/upm_fact-min.jpg'],
+        '2': ["FACT - (SSWxUBD)", 'images/overseas/brunei_fact-min.jpg'],
+        '3': ["FACT - (DESxSZTU)", 'images/overseas/shenzhen_fact-min.jpg'],
 }
 
 berkeley = {
-        '1': ["Berkeley Summer Sessions Group 1", ],
-        '2': ["Berkeley Summer Sessions Group 2", ],
-        '3': ["Berkeley Summer Sessions Group 3", ],
-        '4': ["Berkeley Summer Sessions Group 4", ],
-        '5': ["Berkeley Summer Sessions Group 5", ],
+        '1': ["Berkeley Summer Sessions Group 1", 'images/overseas/berkeley_grp1-min.jpg'],
+        '2': ["Berkeley Summer Sessions Group 2", 'images/overseas/berkeley_grp2-min.jpg'],
+        '3': ["Berkeley Summer Sessions Group 3", 'images/overseas/berkeley_grp3-min.jpg'],
+        '4': ["Berkeley Summer Sessions Group 4", 'images/overseas/berkeley_grp4-min.jpg'],
+        '5': ["Berkeley Summer Sessions Group 5", 'images/overseas/berkeley_grp5-min.jpg'],
 }
 
 stanford = {
-    '1': ["Stanford IHP Poster Group 1", ],
-    '2': ["Stanford IHP Poster Group 2", ],
-    '3': ["Stanford IHP Poster Group 3", ],
-    '4': ["Stanford Summer Session Poster", ],
+    '1': ["Stanford IHP Poster Group 1", 'images/overseas/stanford-min.jpg'],
+    '2': ["Stanford IHP Poster Group 2", 'images/overseas/stanford_grp2-min.jpg'],
+    '3': ["Stanford IHP Poster Group 3", 'images/overseas/stanford_grp3-min.jpg'],
+    '4': ["Stanford Summer Session Poster", 'images/overseas/stanford_summer-min.jpg'],
 }
 
 berlin = {
-    '1': ["TU Berlin Summer School Poster Group 1", ],
-    '2': ["TU Berlin Summer School Poster Group 2", ],
-    '3': ["SP TU Berlin Summer Poster", ],
+    '1': ["TU Berlin Summer School Poster Group 1", 'images/overseas/berlin_grp1-min.jpg'],
+    '2': ["TU Berlin Summer School Poster Group 2", 'images/overseas/berlin_grp2-min.jpg'],
+    '3': ["SP TU Berlin Summer Poster", 'images/overseas/berlin_summer-min.jpg'],
 }
 
 aalto = {
-    '4': ["Aalto Arts Poster Group", ],
-    '5': ["Aalto ITP poster group", ],
+    '1': ["Aalto Arts Poster Group", 'images/overseas/aalto_arts-min.jpg'],
+    '2': ["Aalto ITP poster group", 'images/overseas/aalto_ltp-min.jpg'],
 }
 
 kaist = {
-    '1': ["KAIST Poster Summer Group", ],
+    '1': ["KAIST Poster Summer Group", 'images/overseas/kaist-min.jpg'],
 }
 
 hanyang = {
-    '1': ["Hanyang Summer School Poster group", ]
+    '1': ["Hanyang Summer School Poster group", 'images/overseas/hanyang-min.jpg']
 }
 
 yonsei = {
-    '1': ["Yonsei Poster Group", ]
+    '1': ["Yonsei Poster Group", 'images/overseas/yonsei-min.jpg']
 }
 
 skku = {
-    '1': ["SKKU Summer poster", ]
+    '1': ["SKKU Summer poster", 'images/overseas/sungkyunkwan-min.jpg']
 }
 
 ubc = {
-    '1': ["UBC Summer Poster Group", ]
+    '1': ["UBC Summer Poster Group", 'images/overseas/ubc-min.jpg']
 }
 
 macau = {
-    '1': ["University of Macau Summer Camp", ]
+    '1': ["University of Macau Summer Camp", 'images/overseas/macau-min.jpg']
 }
 
 iacocca = {
-    '1': ["Lehigh IACOCCA INSTITUTE GLOBAL VILLAGE Summer Poster", ]
+    '1': ["Lehigh IACOCCA INSTITUTE GLOBAL VILLAGE Summer Poster", 'images/overseas/iacocca-min.jpg']
 }
 
 mitacs = {
-    '1': ["Mitacs poster", ]
+    '1': ["Mitacs poster", 'images/overseas/mitacs-min.jpg']
+}
+
+# overseas
+overseass = {
+    '1': ['Fact', fact],
+    '2': ['Berkeley', berkeley],
+    '3': ['Stanford', stanford],
+    '4': ['Berlin', berlin],
+    '5': ['Aalto', aalto],
+    '6': ['Kaist', kaist],
+    '7': ['Hanyang', hanyang],
+    '8': ['Yonsei', yonsei],
+    '9': ['Skku', skku],
+    '10': ['UBC', ubc],
+    '11': ['Macau', macau],
+    '12': ['Iacocca', iacocca],
+    '13': ['Mitacs', mitacs]
 }
 
 fifth_rows = {

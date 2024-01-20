@@ -9,7 +9,7 @@ from functools import wraps
 from telegram import Update, ReplyKeyboardRemove, ChatAction, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler, Updater, CommandHandler, MessageHandler, Filters
 from dotenv import load_dotenv
-from posters import urop, overseas, fifth_rows
+from posters import urop, overseass, fifth_rows
 
 
 load_dotenv()
@@ -66,13 +66,14 @@ def send_typing_action(func):
     return command_func
 
 
-#TODO - PDPA
 @send_typing_action
 def start(update: Update, _: CallbackContext):
     """Starts the conversation."""
     user = update.message.from_user
     user_id = str(update.message.chat_id)
     reply_keyboard = [['Yes', 'No']]
+    print(f'{deleted_userid_database=}')
+    print(f'{userid_database=}')
     if user_id in userid_database:
         deleted_userid_database[user_id] = userid_database[user_id]
         userid_database[user_id] = ['revote']
@@ -81,7 +82,7 @@ def start(update: Update, _: CallbackContext):
     logger.info(f"{user.first_name} has started the bot")
     update.message.reply_text(
         "Thank you for participating in LCC Voting. You can view all the posters on "
-        "our website. \nhttps://lcc.sutd.edu.sg/ \n\nYou are only allowed to vote for one poster. You will "
+        "our website. \n\n https://lcc.sutd.edu.sg/ \n\nYou are only allowed to vote for one poster. You will "
         "automatically be entered into a lucky draw when you vote for your "
         "favourite poster.")
     sleep(1)
@@ -120,10 +121,10 @@ def category(update: Update, _: CallbackContext):
         if user_id in deleted_userid_database:
             # This ensures that people don't just cancel or answer no to reset their vote count
             userid_database[user_id] = deleted_userid_database[user_id]  # transfer old data back
-            deleted_userid_database[user_id].clear()  # clear the old database
+            del deleted_userid_database[user_id]  # clear the old database
         # user if voting for first time
         else:
-            userid_database[user_id].clear()
+            del userid_database[user_id]
         return ConversationHandler.END
 
 @send_typing_action
@@ -154,12 +155,13 @@ def voting(update: Update, _: CallbackContext):
                           ['11', '12'],
                           ['13']]
         poster_string = ''
-        for key, value in overseas.items():
+        for key, value in overseass.items():
             poster_string += f'{key}.) {value[0]} \n'
         update.message.reply_text(
-            "You have chosen the overseas Opportunities category. Which University would you like to vote for? \n\n"
+            "You have chosen the overseas Opportunities category. Which University or Category"
+            " is the poster under? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
-        logger.info("User %s is choosing an option for overseas Opportunities", user.first_name)
+        logger.info("User %s is choosing an option for Overseas Opportunities", user.first_name)
         return OVERSEAS
 
     if update.message.text == '3':
@@ -180,24 +182,49 @@ def voting(update: Update, _: CallbackContext):
         return CONFIRMATION
 
 @send_typing_action
+def overseas(update: Update, _: CallbackContext):
+    """Choose overseas poster after choosing country"""
+    user_id = str(update.message.chat_id)
+    user = update.message.from_user
+    userid_database[user_id].append(overseass[update.message.text][0])
+    userid_database[user_id].append(overseass[update.message.text][1])
+    overseas_dict = overseass[update.message.text][1]
+    input_range = len(overseas_dict.keys())
+    reply_keyboard = []
+    for i in range(1, input_range+1, 2):
+        if i+1 < input_range + 1:
+            reply_keyboard.append([str(i), str(i + 1)])
+        else:
+            reply_keyboard.append([str(i)])
+    poster_string = ''
+    for key, value in overseas_dict.items():
+        poster_string += f'{key}.) {value[0]} \n'
+    update.message.reply_text(
+        f"You have chosen {overseass[update.message.text][0]}. Which Poster would you like to vote for? \n\n"
+        f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
+    return CONFIRMATION
+@send_typing_action
 def confirmation(update: Update, _: CallbackContext):
     """Verify confirmation of posters before writing to db and releasing lucky draw number"""
     reply_keyboard = [["Yes", "No"]]
     user = update.message.from_user
     user_id = str(update.message.chat_id)
+
     if userid_database[user_id][1].lower() == 'urop':
         userid_database[user_id].append(urop[update.message.text][0])
         poster_picture = urop[update.message.text][1]
         poster_name = urop[update.message.text][0]
     elif userid_database[user_id][1].lower() == 'overseas':
-        # TODO - need to check for the country
-        userid_database[user_id].append(overseas[update.message.text][0])
-        poster_picture = overseas[update.message.text][1]
-        poster_name = overseas[update.message.text][0]
+        # get the dict
+        overseas_dict = userid_database[user_id][3]
+        userid_database[user_id].append(overseas_dict[update.message.text][0])
+        poster_picture = overseas_dict[update.message.text][1]
+        poster_name = overseas_dict[update.message.text][0]
     else:
         userid_database[user_id].append(fifth_rows[update.message.text][0])
         poster_picture = fifth_rows[update.message.text][1]
         poster_name = fifth_rows[update.message.text][0]
+
     if userid_database[user_id][0].lower() == 'revote':
         logger.info("User %s is revoting", user.first_name)
         bot.sendPhoto(update.message.chat_id, open(poster_picture, 'rb'),
@@ -206,7 +233,6 @@ def confirmation(update: Update, _: CallbackContext):
         update.message.reply_text(
             "You have already voted. Would like to revote for this poster?",
             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-        return SUBMIT
     else:
         logger.info("User %s is voting", user.first_name)
         bot.sendPhoto(update.message.chat_id, open(poster_picture, 'rb'),
@@ -215,83 +241,100 @@ def confirmation(update: Update, _: CallbackContext):
         update.message.reply_text(
             "Would you like to vote for this poster?",
             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-        return SUBMIT
+    return SUBMIT
 
 
 @send_typing_action
 def submit(update: Update, _: CallbackContext):
-    # TODO - account for "NO" response
     user_id = str(update.message.chat_id)
     user = update.message.from_user
-    userid_action = userid_database[user_id][0]
-    userid_category = userid_database[user_id][1]
-    # vote
-    update.message.reply_text(
-        "Please wait while we save your response..."
-    )
-    if userid_action.lower() == "vote":
-        global luckydraw_no
-        # not overseas
-        if len(userid_database[user_id]) == 3:
-            userid_poster = userid_database[user_id][2]
-            ref.child(userid_category).child(userid_poster).update({user_id: str(luckydraw_no)})
-            userid_database[user_id].append(str(luckydraw_no))
-        # overseas
-        else:
-            userid_country = userid_database[user_id][2]
-            userid_poster = userid_database[user_id][3]
-            ref.child(userid_category).child(userid_country).child(userid_poster).update({user_id: str(luckydraw_no)})
-            userid_database[user_id].append(str(luckydraw_no))
-
-        # Response for voting
+    if update.message.text.lower() == 'yes':
+        userid_action = userid_database[user_id][0]
+        userid_category = userid_database[user_id][1]
+        # vote
         update.message.reply_text(
-            f"Your vote was {userid_poster}.\n"
-            f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
-            f"We will be announcing the winner at 5:30pm."
-            f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+            "Please wait while we save your response..."
         )
-        luckydraw_no += 1
-        logger.info("User %s has voted", user.first_name)
-    # revote
+        if userid_action.lower() == "vote":
+            global luckydraw_no
+            # not overseas
+            if len(userid_database[user_id]) == 3:
+                userid_poster = userid_database[user_id][2]
+                ref.child(userid_category).child(userid_poster).update({user_id: str(luckydraw_no)})
+                userid_database[user_id].append(str(luckydraw_no))
+            # overseas
+            else:
+                userid_country = userid_database[user_id][2]
+                userid_poster = userid_database[user_id][4]
+                ref.child(userid_category).child(userid_country).child(userid_poster).update({user_id: str(luckydraw_no)})
+                userid_database[user_id].append(str(luckydraw_no))
+
+            # Response for voting
+            update.message.reply_text(
+                f"Your vote was {userid_poster}.\n\n"
+                f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
+                f"We will be announcing the winner at 5:30pm."
+                f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+            )
+            luckydraw_no += 1
+            logger.info("User %s has voted", user.first_name)
+        # revote
+        else:
+            # delete all old info
+            deleted_user_info = deleted_userid_database[user_id]
+            # Means not overseas
+            if len(deleted_user_info) == 4:
+                deleted_userid_category, deleted_userid_poster, deleted_userid_luckydraw = deleted_user_info[1], \
+                    deleted_user_info[2], deleted_user_info[3]
+                ref.child(deleted_userid_category).child(deleted_userid_poster).child(user_id).delete()
+
+            # overseas since additional country
+            else:
+                print(deleted_user_info)
+                deleted_userid_category, deleted_userid_country, deleted_userid_poster, deleted_userid_luckydraw = \
+                    deleted_user_info[1], deleted_user_info[2], deleted_user_info[4], deleted_user_info[5]
+                ref.child(deleted_userid_category).child(deleted_userid_country) \
+                    .child(deleted_userid_poster).child(user_id).delete()
+
+            # Add new info
+            # not overseas
+            if len(userid_database[user_id]) == 3:
+                userid_poster = userid_database[user_id][2]
+                ref.child(userid_category).child(userid_poster).update({user_id: str(deleted_userid_luckydraw)})
+                userid_database[user_id].append(str(deleted_userid_luckydraw))
+            # overseas
+            else:
+                userid_country = userid_database[user_id][2]
+                userid_poster = userid_database[user_id][4]
+                ref.child(userid_category).child(userid_country).child(userid_poster).update(
+                    {user_id: str(deleted_userid_luckydraw)})
+                userid_database[user_id].append(str(deleted_userid_luckydraw))
+
+                # Response for revote
+            update.message.reply_text(
+                f"Your vote has been changed to {userid_poster}.\n\n"
+                f"Your lucky draw number is still "
+                f"{'0' * (4 - len(str(deleted_userid_luckydraw))) + str(deleted_userid_luckydraw)}. \n\n"
+                f"We will be announcing the winner at 5:30pm."
+                f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+            )
+            logger.info("User %s has revoted", user.first_name)
+            del deleted_userid_database[user_id]
+
     else:
-        # delete all old info
-        deleted_user_info = deleted_userid_database[user_id]
-        # Means not overseas
-        if len(deleted_user_info) == 4:
-            deleted_userid_category, deleted_userid_poster, deleted_userid_luckydraw = deleted_user_info[1], \
-                deleted_user_info[2], deleted_user_info[3]
-            ref.child(deleted_userid_category).child(deleted_userid_poster).child(user_id).delete()
-
-        # overseas since additional country
-        else:
-            deleted_userid_category, deleted_userid_country, deleted_userid_poster, deleted_userid_luckydraw = \
-                deleted_user_info[1], deleted_user_info[2], deleted_userid_database[3], deleted_userid_database[4]
-            ref.child(deleted_userid_category).child(deleted_userid_country) \
-                .child(deleted_userid_poster).child(user_id).delete()
-
-        # Add new info
-        # not overseas
-        if len(userid_database[user_id]) == 3:
-            userid_poster = userid_database[user_id][2]
-            ref.child(userid_category).child(userid_poster).update({user_id: str(deleted_userid_luckydraw)})
-            userid_database[user_id].append(str(deleted_userid_luckydraw))
-        # overseas
-        else:
-            userid_country = userid_database[user_id][2]
-            userid_poster = userid_database[user_id][3]
-            ref.child(userid_category).child(userid_country).child(userid_poster).update(
-                {user_id: str(deleted_userid_luckydraw)})
-            userid_database[user_id].append(str(deleted_userid_luckydraw))
-
-            # Response for revote
+        logger.info("User %s has answered no to voting.", user.first_name)
         update.message.reply_text(
-            f"Your vote has been changed to {userid_poster}.\n"
-            f"Your lucky draw number is still "
-            f"{'0' * (4 - len(str(deleted_userid_luckydraw))) + str(deleted_userid_luckydraw)}. \n\n"
-            f"We will be announcing the winner at 5:30pm."
-            f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+            "You have answered no to the confirmation. Please vote again by doing /start",
+            reply_markup=ReplyKeyboardRemove()
         )
-        logger.info("User %s has revoted", user.first_name)
+        # check if user is revoting
+        if user_id in deleted_userid_database:
+            # This ensures that people don't just cancel or answer no to reset their vote count
+            userid_database[user_id] = deleted_userid_database[user_id]  # transfer old data back
+            del deleted_userid_database[user_id]  # clear the old database
+        # user if voting for first time
+        else:
+            del userid_database[user_id]  # delete userid from database
     return ConversationHandler.END
 
 @send_typing_action
@@ -307,10 +350,10 @@ def cancel(update: Update, _: CallbackContext):
     if user_id in deleted_userid_database:
         # This ensures that people don't just cancel or answer no to reset their vote count
         userid_database[user_id] = deleted_userid_database[user_id]  # transfer old data back
-        deleted_userid_database[user_id].clear()  # clear the old database
+        del deleted_userid_database[user_id]  # clear the old database
     # user if voting for first time
     else:
-        userid_database[user_id].clear()  # delete userid from database
+        del userid_database[user_id]  # delete userid from database
     return ConversationHandler.END
 
 
@@ -324,8 +367,8 @@ if __name__ == '__main__':
         states={
             CATEGORY: [MessageHandler(Filters.regex('(?i)^(yes|no)$'), category)],
             VOTING: [MessageHandler(Filters.regex('^[1-3]$'), voting)],
-            # OVERSEAS: [MessageHandler(Filters.regex('[1-11]'), overseas)],
-            CONFIRMATION: [MessageHandler(Filters.regex('[1-9]|1[0-3]?'), confirmation)],
+            OVERSEAS: [MessageHandler(Filters.regex('[1-9]|1[0-3]?'), overseas)],
+            CONFIRMATION: [MessageHandler(Filters.regex('[1-9]|1[0-1]?'), confirmation)],
             SUBMIT: [MessageHandler(Filters.regex('(?i)^(yes|no)$'), submit)]
 
         },
