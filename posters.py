@@ -74,15 +74,15 @@ mitacs = {
 
 # overseas
 overseass = {
-    '1': ['Fact', fact],
+    '1': ['FACT', fact],
     '2': ['Berkeley', berkeley],
     '3': ['Stanford', stanford],
     '4': ['Berlin', berlin],
     '5': ['Aalto', aalto],
-    '6': ['Kaist', kaist],
+    '6': ['KAIST', kaist],
     '7': ['Hanyang', hanyang],
     '8': ['Yonsei', yonsei],
-    '9': ['Skku', skku],
+    '9': ['SKKU', skku],
     '10': ['UBC', ubc],
     '11': ['Macau', macau],
     '12': ['Iacocca', iacocca],

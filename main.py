@@ -114,7 +114,7 @@ def category(update: Update, _: CallbackContext):
         return VOTING
     # "NO" response
     else:
-        logger.info(f"{user.first_name} has rejected the PDPA clause")
+        logger.info(f"{user.name} has rejected the PDPA clause")
         update.message.reply_text("Please consent to the PDPA clause to proceed with registering!",
                                   reply_markup=ReplyKeyboardRemove())
         # check if user is revoting
@@ -158,7 +158,7 @@ def voting(update: Update, _: CallbackContext):
         for key, value in overseass.items():
             poster_string += f'{key}.) {value[0]} \n'
         update.message.reply_text(
-            "You have chosen the overseas Opportunities category. Which University or Category"
+            "You have chosen the Overseas Opportunities category. Which University or Category"
             " is the poster under? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
         logger.info("User %s is choosing an option for Overseas Opportunities", user.first_name)
@@ -274,8 +274,9 @@ def submit(update: Update, _: CallbackContext):
             update.message.reply_text(
                 f"Your vote was {userid_poster}.\n\n"
                 f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
-                f"We will be announcing the winner at 5:30pm."
-                f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+                f"The lucky draw reveal will be at 5.30pm @ Campus Centre. "
+                f"Please be reminded that you will have to be present physically to "
+                f"receive the prize", reply_markup=ReplyKeyboardRemove()
             )
             luckydraw_no += 1
             logger.info("User %s has voted", user.first_name)
@@ -316,8 +317,9 @@ def submit(update: Update, _: CallbackContext):
                 f"Your vote has been changed to {userid_poster}.\n\n"
                 f"Your lucky draw number is still "
                 f"{'0' * (4 - len(str(deleted_userid_luckydraw))) + str(deleted_userid_luckydraw)}. \n\n"
-                f"We will be announcing the winner at 5:30pm."
-                f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+                f"The lucky draw reveal will be at 5.30pm @ Campus Centre. "
+                f"Please be reminded that you will have to be present physically to "
+                f"receive the prize", reply_markup=ReplyKeyboardRemove()
             )
             logger.info("User %s has revoted", user.first_name)
             del deleted_userid_database[user_id]
