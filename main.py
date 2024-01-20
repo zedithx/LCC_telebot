@@ -231,7 +231,7 @@ def confirmation(update: Update, _: CallbackContext):
                       caption=poster_name)
         sleep(1)
         update.message.reply_text(
-            "You have already voted. Would like to revote for this poster?",
+            "You have already voted. Would you like to revote for this poster?",
             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
     else:
         logger.info("User %s is voting", user.first_name)
@@ -260,13 +260,14 @@ def submit(update: Update, _: CallbackContext):
             # not overseas
             if len(userid_database[user_id]) == 3:
                 userid_poster = userid_database[user_id][2]
-                ref.child(userid_category).child(userid_poster).update({user_id: str(luckydraw_no)})
+                ref.child(userid_category).child(userid_poster).child(user_id).update({user.first_name: str(luckydraw_no)})
                 userid_database[user_id].append(str(luckydraw_no))
             # overseas
             else:
                 userid_country = userid_database[user_id][2]
                 userid_poster = userid_database[user_id][4]
-                ref.child(userid_category).child(userid_country).child(userid_poster).update({user_id: str(luckydraw_no)})
+                ref.child(userid_category).child(userid_country).child(userid_poster).child(user_id)\
+                    .update({user.first_name: str(luckydraw_no)})
                 userid_database[user_id].append(str(luckydraw_no))
 
             # Response for voting
@@ -290,7 +291,6 @@ def submit(update: Update, _: CallbackContext):
 
             # overseas since additional country
             else:
-                print(deleted_user_info)
                 deleted_userid_category, deleted_userid_country, deleted_userid_poster, deleted_userid_luckydraw = \
                     deleted_user_info[1], deleted_user_info[2], deleted_user_info[4], deleted_user_info[5]
                 ref.child(deleted_userid_category).child(deleted_userid_country) \
@@ -300,14 +300,15 @@ def submit(update: Update, _: CallbackContext):
             # not overseas
             if len(userid_database[user_id]) == 3:
                 userid_poster = userid_database[user_id][2]
-                ref.child(userid_category).child(userid_poster).update({user_id: str(deleted_userid_luckydraw)})
+                ref.child(userid_category).child(userid_poster).child(user_id).\
+                    update({user.first_name: str(deleted_userid_luckydraw)})
                 userid_database[user_id].append(str(deleted_userid_luckydraw))
             # overseas
             else:
                 userid_country = userid_database[user_id][2]
                 userid_poster = userid_database[user_id][4]
-                ref.child(userid_category).child(userid_country).child(userid_poster).update(
-                    {user_id: str(deleted_userid_luckydraw)})
+                ref.child(userid_category).child(userid_country).child(userid_poster).child(user_id).update(
+                    {user.first_name: str(deleted_userid_luckydraw)})
                 userid_database[user_id].append(str(deleted_userid_luckydraw))
 
                 # Response for revote
