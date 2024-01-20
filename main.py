@@ -1,7 +1,5 @@
 import os
 import logging
-from time import sleep
-
 import telegram
 import firebase_admin
 from firebase_admin import db
@@ -23,25 +21,17 @@ logger = logging.getLogger(__name__)
 """initialising variables/bot"""
 bot = telegram.Bot(token=os.environ.get("TOKEN"))
 luckydraw_no = 1
-userid_database = {}
-# category --> country (For overseas only) -->
 
 # define no. of variables to be stored
-CATEGORY, VOTING, OVERSEAS, CONFIRMATION, SUBMIT = range(5)
-
-""" 
-Start: Introduction and PDPA clause
-Category: Choose the category (Overseas, UROP, Fifth Row)
-Overseas: Choose country of Overseas
-Confirmation: Show final details of poster voted before writing to db
-Voting: Write to db, return response of their lucky draw number
-"""
+VOTING, CATEGORY, UROP, OVERSEAS, FIFTHROW = range(5)
 
 # Flow 1
-""" start --> category --> voting --> confirmation --> submit"""
+""" start --> category --> urop --> voting_urop """
 # Flow 2
 """Overseas has an additional choosing of country before the final poster selection"""
-""" start --> category --> voting --> overseas --> confirmation --> submit"""
+""" start --> category --> overseas --> overseas_phase2 --> voting_overseas"""
+# Flow 3
+""" start --> category --> fifthrow --> voting_fifthrow"""
 
 """Initialising firebase creds"""
 cred_obj = firebase_admin.credentials.Certificate('./creds.json')
@@ -62,60 +52,31 @@ def send_typing_action(func):
     return command_func
 
 
-#TODO - PDPA
 @send_typing_action
 def start(update: Update, _: CallbackContext):
     """Starts the conversation."""
     user = update.message.from_user
-    user_id = str(update.message.chat_id)
-    reply_keyboard = [['Yes', 'No']]
-    userid_database[user_id] = []
-    logger.info(f"{user.first_name} has started the bot")
+    reply_keyboard = [['1', '2', '3']]
     update.message.reply_text(
         "Thank you for participating in LCC Voting. You can view all the posters on"
         "our website https://lcc.sutd.edu.sg/. \n\nYou are only allowed to vote for one poster. You will "
         "automatically be entered into a lucky draw when you vote for your"
-        "favourite poster.")
-    sleep(2)
-    update.message.reply_text(
-        "Do you consent to the collection, use or disclosure of your personal data only for the purpose of this event?",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard)
+        "favourite poster.\n\n"
+        "Which category would you like to vote for \n\n"
+        "1: UROP \n"
+        "2: Overseas Opportunities \n"
+        "3: Fifth Rows \n\n"
+        "Send /cancel to stop talking to me.", reply_markup=ReplyKeyboardMarkup(reply_keyboard)
     )
+    logger.info("User %s is choosing a category", user.first_name)
     return CATEGORY
-
-
 
 @send_typing_action
 def category(update: Update, _: CallbackContext):
-    """Let user choose the category"""
-    user_id = str(update.message.chat_id)
-    user = update.message.from_user
-    reply_keyboard = [['1', '2', '3']]
-    if update.message.text.lower() == 'yes':
-        logger.info("User %s is choosing a category", user.first_name)
-        update.message.reply_text(
-        "Which category would you like to vote for \n\n"
-                "1: UROP \n"
-                "2: Overseas Opportunities \n"
-                "3: Fifth Rows \n\n"
-                "Send /cancel to stop talking to me.", reply_markup=ReplyKeyboardMarkup(reply_keyboard)
-            )
-        return VOTING
-    else:
-        logger.info(f"{user.first_name} has rejected the PDPA clause")
-        update.message.reply_text("Please consent to the PDPA clause to proceed with registering!",
-                                  reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
-
-@send_typing_action
-def voting(update: Update, _: CallbackContext):
-    """User to choose the poster"""
-    user_id = str(update.message.chat_id)
+    """Let user choose the options based on category"""
     user = update.message.from_user
     # UROP
     if update.message.text == '1':
-        userid_database[user_id].append('UROP')
         reply_keyboard = [['1', '2', '3', '4']]
         poster_string = ''
         for poster in posters.urop:
@@ -124,129 +85,57 @@ def voting(update: Update, _: CallbackContext):
             "You have chosen the UROP category. Which poster do you wish to vote for? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard))
         logger.info("User %s is choosing an option for UROP", user.first_name)
-        return CONFIRMATION
-
+        return UROP
     if update.message.text == '2':
-        userid_database[user_id].append('OVERSEAS')
-        reply_keyboard = [['1', '2'],
-                          ['3', '4'],
-                          ['5', '6'],
-                          ['7', '8'],
-                          ['9', '10'],
-                          ['11', '12'],
-                          ['13']]
+        reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']]
         poster_string = ''
         for poster in posters.overseas:
             poster_string += f'{poster}\n'
         update.message.reply_text(
             "You have chosen the Overseas Opportunities category. Which University would you like to vote for? \n\n"
-            f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
+            f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard))
         logger.info("User %s is choosing an option for Overseas Opportunities", user.first_name)
         return OVERSEAS
-
     if update.message.text == '3':
-        userid_database[user_id].append('FIFTHROW')
-        reply_keyboard = [['1', '2'],
-                          ['3', '4'],
-                          ['5', '6'],
-                          ['7', '8'],
-                          ['9', '10'],
-                          ['11']]
+        reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']]
         poster_string = ''
         for poster in posters.fifth_rows:
             poster_string += f'{poster}\n'
         update.message.reply_text(
             "You have chosen the Fifth Row category. Which Poster would you like to vote for? \n\n"
-            f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
+            f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard))
         logger.info("User %s is choosing an option for Fifth Row", user.first_name)
-        return CONFIRMATION
+        return FIFTHROWS
 
 @send_typing_action
-def confirmation(update: Update, _: CallbackContext):
-    """Verify confirmation of posters before writing to db and releasing lucky draw number"""
-    reply_keyboard = [["Yes", "No"]]
-    user = update.message.from_user
-    user_id = str(update.message.chat_id)
-    if user_id in userid_database.keys():
-        userid_database[user_id].append('REVOTE')
-        logger.info("User %s is revoting", user.first_name)
-        bot.sendPhoto(update.message.chat_id, open("images/Archery-min.jpg", 'rb'), caption={posters.urop[update.message.text]})
-        update.message.reply_text(
-            "You have already voted. Would like to revote for this poster?",
-            reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-        return SUBMIT
-    else:
-        userid_database[user_id].append('VOTE')
-        logger.info("User %s is voting", user.first_name)
-        bot.sendPhoto(update.message.chat_id, open("images/Archery-min.jpg", 'rb'),
-                      caption=posters.urop[update.message.text])
-        update.message.reply_text(
-            "Would you like to vote for this poster?",
-            reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-        return SUBMIT
+def category(update: Update, _: CallbackContext):
+    """Let user choose the options based on category"""
 
-
-# @send_typing_action
-# def fifthrow(update: Update, _: CallbackContext):
-#     """Verify confirmation of fifth row poster before writing to db and releasing lucky draw number"""
-#     reply_keyboard = [["Yes", "No"]]
-#     user = update.message.from_user
-#     user_id = str(update.message.chat_id)
-#     all_keys = set().union(*(d.keys() for d in ref.child("voting").get().values() if type(d) == dict))
-#     if user_id in all_keys:
-#         logger.info("User %s is revoting", user.first_name)
-#         bot.sendPhoto(update.message.chat_id, open("images/Archery-min.jpg", 'rb'),
-#                       caption={posters.fifth_rows[update.message.text]})
-#         update.message.reply_text(
-#             "You have already voted. Would like to revote for this poster?",
-#             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-#         return REVOTE_FIFTHROW
-#     else:
-#         logger.info("User %s is voting", user.first_name)
-#         bot.sendPhoto(update.message.chat_id, open("images/Archery-min.jpg", 'rb'),
-#                       caption=posters.fifth_rows[update.message.text])
-#         update.message.reply_text(
-#             "Would you like to vote for this poster?",
-#             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-#         return VOTING_FIFTHROW
-#
-# @send_typing_action
-# def voting_urop(update: Update, _: CallbackContext):
-#     user_id = str(update.message.chat_id)
-#     global luckydraw_no
-#     user = update.message.from_user
-#     ref.child("voting").child("urop").child(update({f"{userID}": f"{str(luckydraw_no)}"})
-#     update.message.reply_text(
-#         f"Your vote was {voting_dict[update.message.text]}.\n"
-#         f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
-#         f"We will be announcing the winner at 6:00pm."
-#         f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
-#     )
-#     luckydraw_no += 1
-#     logger.info("User %s has voted", user.first_name)
-#     return ConversationHandler.END
 
 @send_typing_action
-def submit(update: Update, _: CallbackContext):
-    user_id = str(update.message.chat_id)
+def voting(update: Update, _: CallbackContext):
+    userID = str(update.message.chat_id)
     global luckydraw_no
     user = update.message.from_user
-    userid_category = userid_database[user_id][0]
-    if userid_category.lower() == "urop" or userid_category.lower() == "fifthrow":
-        userid_poster = userid_database[user_id][1]
+    all_keys = set().union(*(d.keys() for d in ref.child("voting").get().values() if type(d) == dict))
+    if userID in all_keys:
+        logger.info("User %s tried to vote multiple times", user.first_name)
+        update.message.reply_text(
+            f"You have already voted. You are only allowed to vote for one poster.\n"
+            f"Please do /revote to change your vote", reply_markup=ReplyKeyboardRemove()
+        )
+        return ConversationHandler.END
     else:
-        userid_country = userid_database[user_id][1]
-        userid_poster = userid_database[user_id][2]
-    ref.child("voting").child(f"{update.message.text}").update({f"{userID}": f"{str(luckydraw_no)}"})
-    update.message.reply_text(
-        f"Your vote was {voting_dict[update.message.text]}.\n"
-        f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
-        f"We will be announcing the winner at 6:00pm."
-        f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
-    )
-    luckydraw_no += 1
-    logger.info("User %s has voted", user.first_name)
-    return ConversationHandler.END
+        ref.child("voting").child(f"{update.message.text}").update({f"{userID}": f"{str(luckydraw_no)}"})
+        update.message.reply_text(
+            f"Your vote was {voting_dict[update.message.text]}.\n"
+            f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
+            f"We will be announcing the winner at 6:00pm."
+            f" Do check back for the results!", reply_markup=ReplyKeyboardRemove()
+        )
+        luckydraw_no += 1
+        logger.info("User %s has voted", user.first_name)
+        return ConversationHandler.END
 
 @send_typing_action
 def revote(update: Update, _: CallbackContext):
@@ -309,19 +198,24 @@ if __name__ == '__main__':
     start_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CATEGORY: [MessageHandler(Filters.regex('(?i)^(yes|no)$'), category)],
-            VOTING: [MessageHandler(Filters.regex('^[1-3]$'), voting)],
-            OVERSEAS: [MessageHandler(Filters.regex('[1-11]'), overseas)],
-            CONFIRMATION: [MessageHandler(Filters.regex('^[1-13]$'), confirmation)],
-            SUBMIT: [MessageHandler(Filters.regex('(?i)^(yes|no)$'), submit)]
-
+            CATEGORY: [MessageHandler(Filters.regex('^[1-13]$'), category)],
+            VOTING: [MessageHandler(Filters.regex('^[1-4]$'), voting)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
         run_async=True
     )
 
+    revote_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("revote", revote)],
+        states={
+            REVOTING: [MessageHandler(Filters.regex('^[1-4]$'), revoting)]
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+        run_async=True
+    )
 
     dispatcher.add_handler(start_conv_handler)
+    dispatcher.add_handler(revote_conv_handler)
     updater.start_polling()
     # test = updater.start_webhook(listen="0.0.0.0",
     #                              port=PORT,
