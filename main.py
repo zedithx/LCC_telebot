@@ -79,7 +79,7 @@ def start(update: Update, _: CallbackContext):
         userid_database[user_id] = ['revote']
     else:
         userid_database[user_id] = ['vote']
-    logger.info(f"{user.first_name} has started the bot")
+    logger.info(f"{user.full_name} has started the bot")
     update.message.reply_text(
         "Thank you for participating in LCC Voting. You can view all the posters on "
         "our website. \n\n https://lcc.sutd.edu.sg/ \n\nYou are only allowed to vote for one poster. You will "
@@ -103,7 +103,7 @@ def category(update: Update, _: CallbackContext):
     reply_keyboard = [['1', '2', '3']]
     # "YES" response
     if update.message.text.lower() == 'yes':
-        logger.info("User %s is choosing a category", user.first_name)
+        logger.info("User %s is choosing a category", user.full_name)
         update.message.reply_text(
             "Which category would you like to vote for \n\n"
             "1: UROP \n"
@@ -114,7 +114,7 @@ def category(update: Update, _: CallbackContext):
         return VOTING
     # "NO" response
     else:
-        logger.info(f"{user.name} has rejected the PDPA clause")
+        logger.info(f"{user.full_name} has rejected the PDPA clause")
         update.message.reply_text("Please consent to the PDPA clause to proceed with registering!",
                                   reply_markup=ReplyKeyboardRemove())
         # check if user is revoting
@@ -142,7 +142,7 @@ def voting(update: Update, _: CallbackContext):
         update.message.reply_text(
             "You have chosen the UROP category. Which poster do you wish to vote for? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-        logger.info("User %s is choosing an option for UROP", user.first_name)
+        logger.info("User %s is choosing an option for UROP", user.full_name)
         return CONFIRMATION
 
     if update.message.text == '2':
@@ -161,7 +161,7 @@ def voting(update: Update, _: CallbackContext):
             "You have chosen the Overseas Opportunities category. Which University or Category"
             " is the poster under? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
-        logger.info("User %s is choosing an option for Overseas Opportunities", user.first_name)
+        logger.info("User %s is choosing an option for Overseas Opportunities", user.full_name)
         return OVERSEAS
 
     if update.message.text == '3':
@@ -178,7 +178,7 @@ def voting(update: Update, _: CallbackContext):
         update.message.reply_text(
             "You have chosen the Fifth Row category. Which Poster would you like to vote for? \n\n"
             f'{poster_string}', reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True))
-        logger.info("User %s is choosing an option for Fifth Row", user.first_name)
+        logger.info("User %s is choosing an option for Fifth Row", user.full_name)
         return CONFIRMATION
 
 @send_typing_action
@@ -226,7 +226,7 @@ def confirmation(update: Update, _: CallbackContext):
         poster_name = fifth_rows[update.message.text][0]
 
     if userid_database[user_id][0].lower() == 'revote':
-        logger.info("User %s is revoting", user.first_name)
+        logger.info("User %s is revoting", user.full_name)
         bot.sendPhoto(update.message.chat_id, open(poster_picture, 'rb'),
                       caption=poster_name)
         sleep(1)
@@ -234,7 +234,7 @@ def confirmation(update: Update, _: CallbackContext):
             "You have already voted. Would you like to revote for this poster?",
             reply_markup=ReplyKeyboardMarkup(reply_keyboard))
     else:
-        logger.info("User %s is voting", user.first_name)
+        logger.info("User %s is voting", user.full_name)
         bot.sendPhoto(update.message.chat_id, open(poster_picture, 'rb'),
                       caption=poster_name)
         sleep(1)
@@ -260,14 +260,14 @@ def submit(update: Update, _: CallbackContext):
             # not overseas
             if len(userid_database[user_id]) == 3:
                 userid_poster = userid_database[user_id][2]
-                ref.child(userid_category).child(userid_poster).child(user_id).update({user.first_name: str(luckydraw_no)})
+                ref.child(userid_category).child(userid_poster).child(user_id).update({user.full_name: str(luckydraw_no)})
                 userid_database[user_id].append(str(luckydraw_no))
             # overseas
             else:
                 userid_country = userid_database[user_id][2]
                 userid_poster = userid_database[user_id][4]
                 ref.child(userid_category).child(userid_country).child(userid_poster).child(user_id)\
-                    .update({user.first_name: str(luckydraw_no)})
+                    .update({user.full_name: str(luckydraw_no)})
                 userid_database[user_id].append(str(luckydraw_no))
 
             # Response for voting
@@ -279,7 +279,7 @@ def submit(update: Update, _: CallbackContext):
                 f"receive the prize", reply_markup=ReplyKeyboardRemove()
             )
             luckydraw_no += 1
-            logger.info("User %s has voted", user.first_name)
+            logger.info("User %s has voted", user.full_name)
         # revote
         else:
             # delete all old info
@@ -302,14 +302,14 @@ def submit(update: Update, _: CallbackContext):
             if len(userid_database[user_id]) == 3:
                 userid_poster = userid_database[user_id][2]
                 ref.child(userid_category).child(userid_poster).child(user_id).\
-                    update({user.first_name: str(deleted_userid_luckydraw)})
+                    update({user.full_name: str(deleted_userid_luckydraw)})
                 userid_database[user_id].append(str(deleted_userid_luckydraw))
             # overseas
             else:
                 userid_country = userid_database[user_id][2]
                 userid_poster = userid_database[user_id][4]
                 ref.child(userid_category).child(userid_country).child(userid_poster).child(user_id).update(
-                    {user.first_name: str(deleted_userid_luckydraw)})
+                    {user.full_name: str(deleted_userid_luckydraw)})
                 userid_database[user_id].append(str(deleted_userid_luckydraw))
 
                 # Response for revote
@@ -321,11 +321,11 @@ def submit(update: Update, _: CallbackContext):
                 f"Please be reminded that you will have to be present physically to "
                 f"receive the prize", reply_markup=ReplyKeyboardRemove()
             )
-            logger.info("User %s has revoted", user.first_name)
+            logger.info("User %s has revoted", user.full_name)
             del deleted_userid_database[user_id]
 
     else:
-        logger.info("User %s has answered no to voting.", user.first_name)
+        logger.info("User %s has answered no to voting.", user.full_name)
         update.message.reply_text(
             "You have answered no to the confirmation. Please vote again by doing /start",
             reply_markup=ReplyKeyboardRemove()
@@ -340,12 +340,21 @@ def submit(update: Update, _: CallbackContext):
             del userid_database[user_id]  # delete userid from database
     return ConversationHandler.END
 
+
+# Error handler function
+def error(update: Update, context: CallbackContext):
+    """Log errors and handle them gracefully"""
+    user = update.message.from_user
+    logger.error(f"Error: {user} entered {context.error} as input")
+    update.message.reply_text(
+        "That was an invalid response. Please try entering a valid response.")
+
 @send_typing_action
 def cancel(update: Update, _: CallbackContext):
     """Cancels and ends the conversation."""
     user = update.message.from_user
     user_id = str(update.message.chat_id)
-    logger.info("User %s canceled the conversation.", user.first_name)
+    logger.info("User %s canceled the conversation.", user.full_name)
     update.message.reply_text(
         "We hope that you will eventually participate in the LCC Voting!", reply_markup=ReplyKeyboardRemove()
     )
@@ -380,6 +389,7 @@ if __name__ == '__main__':
     )
 
     dispatcher.add_handler(start_conv_handler)
+    dispatcher.add_error_handler(error)
     updater.start_polling()
     # test = updater.start_webhook(listen="0.0.0.0",
     #                              port=PORT,
