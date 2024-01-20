@@ -11,7 +11,6 @@ from telegram.ext import CallbackContext, ConversationHandler, Updater, CommandH
 from dotenv import load_dotenv
 from posters import urop, overseass, fifth_rows
 
-
 load_dotenv()
 
 PORT = int(os.environ.get('PORT', '8443'))
@@ -82,12 +81,13 @@ def start(update: Update, _: CallbackContext):
     logger.info(f"{user.full_name} has started the bot")
     update.message.reply_text(
         "Thank you for participating in LCC Voting. You can view all the posters on "
-        "our website. \n\n https://lcc.sutd.edu.sg/ \n\nYou are only allowed to vote for one poster. You will "
+        "our website. \n\nhttps://lcc.sutd.edu.sg/ \n\nYou are only allowed to vote for one poster. You will "
         "automatically be entered into a lucky draw when you vote for your "
         "favourite poster.")
     sleep(1)
     update.message.reply_text(
-        "Do you consent to the collection, use or disclosure of your personal data only for the purpose of this event?",
+        "Do you consent to the collection, use or disclosure of your personal data only for the purpose of this event?"
+        + ' 🤨',
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard)
     )
@@ -276,7 +276,7 @@ def submit(update: Update, _: CallbackContext):
                 f"Your lucky draw number is {'0' * (4 - len(str(luckydraw_no))) + str(luckydraw_no)}. \n\n"
                 f"The lucky draw reveal will be at 5.30pm @ Campus Centre. "
                 f"Please be reminded that you will have to be present physically to "
-                f"receive the prize", reply_markup=ReplyKeyboardRemove()
+                f"receive the prize. See you there!" + ' 👋🏻👋🏻', reply_markup=ReplyKeyboardRemove()
             )
             luckydraw_no += 1
             logger.info("User %s has voted", user.full_name)
@@ -319,7 +319,7 @@ def submit(update: Update, _: CallbackContext):
                 f"{'0' * (4 - len(str(deleted_userid_luckydraw))) + str(deleted_userid_luckydraw)}. \n\n"
                 f"The lucky draw reveal will be at 5.30pm @ Campus Centre. "
                 f"Please be reminded that you will have to be present physically to "
-                f"receive the prize", reply_markup=ReplyKeyboardRemove()
+                f"receive the prize. See you there!" + ' 👋🏻👋🏻', reply_markup=ReplyKeyboardRemove()
             )
             logger.info("User %s has revoted", user.full_name)
             del deleted_userid_database[user_id]
@@ -327,7 +327,7 @@ def submit(update: Update, _: CallbackContext):
     else:
         logger.info("User %s has answered no to voting.", user.full_name)
         update.message.reply_text(
-            "You have answered no to the confirmation. Please vote again by doing /start",
+            "You have answered no to the confirmation. Please vote again by doing /start" + ' 😡',
             reply_markup=ReplyKeyboardRemove()
         )
         # check if user is revoting
@@ -347,7 +347,7 @@ def error(update: Update, context: CallbackContext):
     user = update.message.from_user
     logger.error(f"Error: {user} entered {context.error} as input")
     update.message.reply_text(
-        "That was an invalid response. Please try entering a valid response.")
+        "That was an invalid response. Please try entering a valid response." + ' 😡')
 
 @send_typing_action
 def cancel(update: Update, _: CallbackContext):
